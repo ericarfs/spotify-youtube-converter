@@ -1,0 +1,99 @@
+{%extends 'content_base.html'%}
+
+{%block section_title%}
+<div class="playlist pl-bg"> 
+    <div class="cover cv-bg">
+        {%if data.playlist['images'][0]%}
+            <img src="{{data.playlist['images'][0]['url']}}" alt=""> 
+        {%endif%}
+    </div>
+    <div class="playlist-info">
+        <h2> {{data.playlist.name}} </h2>
+        {%if data.playlist.description %}
+            <h6 class="pl-description">{{data.playlist.description}}</h6>
+        {%endif%}
+        <h5> {{data.playlist.owner['display_name']}} </h5>
+    </div>
+</div> 
+{%endblock%}
+        
+{%block content%}
+    {%if data.tracks|length < 1%}
+        <h4> There are no tracks in this playlist! </h4>
+    {%else%}
+    <div class="content content-tracks">
+        <form id="tracklist">
+            <table id="playlist-tracks">
+                <thead>
+                    <tr>
+                        <td scope="col">  </td>
+                        <td scope="col"> # </td>
+                        <td scope="col"> Title </td>
+                        <td scope="col"> Artist </td>
+                        <td scope="col"> Album </td>
+                    </tr>
+                </thead>
+                
+                {% for track in data.tracks%}
+                    <tr class="track">
+                        <td><input type="checkbox" name="{{loop.index0}}" checked/>  </td>
+                        <td> {{loop.index0 + 1}} </td>
+                        <th scope="row">{{track['name']}} </th>
+                        <td >{{track['artists']}} </td>
+                        <td >{{track['album']}} </td>
+                    </tr>
+                {%endfor%}
+                
+            
+            </table> 
+                    
+        </form>
+        
+    </div>
+    <div class="footer">
+        <input class="btn btn-sp" type="submit" value="Move playlist" id="move_button"> 
+    </div>
+    <div class="loader" style='display: none;'></div>
+    <h1 class="response"></h1>
+    {%endif%}
+{%endblock%}
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function(){
+   
+   $("#move_button").click(function(e){
+    e.preventDefault()
+    var formData = $('#tracklist').serialize();
+    console.log(formData)
+    
+    if (formData.includes("on")){       
+        $.ajax({
+            url: '/create_playlist',
+            type: 'post',
+            data: formData,
+            beforeSend: function(){
+                $("#playlist-tracks").hide();
+                $("#move_button").hide();
+                $(".loader").show();
+            },
+            success: function(response){
+                console.log(response)
+                var resp = "<a class='btn btn-yt' target = '_blank' href= " +`"/${response}"`+">Go to the Playlist!</a>"
+                console.log(resp)
+                $('.response').append("Transfer Completed!");
+                $('.response').append(resp);
+            },
+            complete:function(data){
+                // Hide image container
+                $(".loader").hide();
+            }
+        });
+    }
+    else{
+        alert("Select at least one song from the playlist!")
+    }
+     
+   });
+});
+</script>
+{%endblock%}

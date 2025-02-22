@@ -1,0 +1,28 @@
+{%extends 'base.html'%}
+
+{% block head %} 
+
+{%endblock%}
+
+{% block body %} 
+<h1> <a href="/"> </a></h1>
+<main>
+    <section>
+        <div class="index">
+            <div class="logo">
+                <h1 class="title">YTify</h1>
+                <span>Moving your Spotify playlists into Youtube in a easy way!<br/></span> 
+                <br/>
+            </div>
+            {%if not logged.spotify %}
+                <a class="btn btn-sp" href="/login" disabled> Connect with Spotify  <i class="fi fi-brands-spotify"></i> </a>
+            {%endif%}
+            {%if not logged.youtube %}
+                <a class="btn btn-yt" href="/google_login"> Connect with Youtube  <i class="fi fi-brands-youtube"></i> </a>
+            {%endif%}
+        </div>
+    </section>      
+</main>
+
+
+{%endblock%}

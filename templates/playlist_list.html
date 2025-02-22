@@ -1,0 +1,30 @@
+{%extends 'content_base.html'%}
+
+{% block section_title%}
+    <i class="fi fi-br-list-music"></i> <h2> My Playlists  </h2>
+{% endblock %}
+
+{%block content%}
+    
+    {%if user_playlists|length < 1%}
+            <h4> There are no playlists! </h4>
+            {%else%}
+            <ul class="content">
+                {%for playlist in user_playlists%}
+                <a href="/playlists/{{loop.index0}}"> 
+                    <li class="playlist pl-sm"> 
+                        <div class="cover cv-sm">
+                            {%if playlist['images'][0]%}
+                                <img src="{{playlist['images'][0]['url']}}" alt=""> 
+                            {%endif%}
+                        </div>
+                        <div class="playlist-info">
+                            <h4> <b> {{playlist.name}} </b></h4>
+                            <h6> {{playlist.owner['display_name']}} </h6>
+                        </div>
+                    </li> 
+                </a>
+                {% endfor%} 
+            </ul>
+    {%endif%}
+{%endblock%}

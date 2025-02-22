@@ -1,0 +1,28 @@
+{%extends 'base.html'%}
+
+{% block head %} 
+
+{%endblock%}
+
+{% block body %} 
+<header class="header">
+    <a class="header-item" href="/"> <h1>YTify</h1> </a>   
+    <a class="header-item" href="/logout">Sign out <i class="fi fi-br-sign-out-alt"></i></a>
+</header>
+<main>
+    <section >
+        <div class="section-title">
+            {%block section_title%}
+         
+            {%endblock%}
+            
+        </div>
+            {%block content%}
+         
+            {%endblock%}
+        
+    </section>
+</main>  
+ 
+
+{%endblock%}
