@@ -25,7 +25,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-REDIRECT_URI = 'https://ytify-swart.vercel.app//callback/spotify'
+REDIRECT_URI = 'https://ytify-swart.vercel.app/callback/spotify'
 scope = 'playlist-read-private'
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -34,7 +34,7 @@ API_BASE_URL = 'https://api.spotify.com/v1/'
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = 'https://ytify-swart.vercel.app//callback/google'
+GOOGLE_REDIRECT_URI = 'https://ytify-swart.vercel.app/callback/google'
 
 YOUTUBE_CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID')
 YOUTUBE_CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
