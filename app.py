@@ -131,23 +131,24 @@ def callback_google():
     return redirect(url_for('index'))
 
 
-@app.route('/playlists')
 def get_playlists():
+    user_playlists = sp.current_user_playlists()
+    return user_playlists['items']
+
+
+@app.route('/playlists')
+def playlists():
     if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         return redirect(url_for('index'))
-    
-    global user_playlists
-    user_playlists = sp.current_user_playlists()['items']
+
+    user_playlists = get_playlists()
 
     return render_template('playlist_list.html', user_playlists=user_playlists)
 
 
-@app.route('/playlists/<id>')
 def get_playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
-        return redirect(url_for('index'))
+    user_playlists = get_playlists()
 
-    global pl
     pl = user_playlists[int(id)]
     pl_id = pl['id']
 
@@ -159,7 +160,6 @@ def get_playlist(id):
         results = sp.next(results)
         tracks.extend(results['items'])
     
-    global pl_tracks
     pl_tracks = []
     for track in tracks:
         if track['track']:
@@ -169,6 +169,16 @@ def get_playlist(id):
 
             track_info = {"name": name, "album": album, "artists":artists}
             pl_tracks.append(track_info)
+    
+    return pl, pl_tracks
+
+
+@app.route('/playlists/<id>')
+def playlist(id):
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        return redirect(url_for('index'))
+
+    pl, pl_tracks = get_playlist(id)
 
     context = {
         "playlist": pl, 
@@ -207,6 +217,8 @@ def create_playlist():
 
     ytmusic = YTMusic(ytoauth, oauth_credentials=OAuthCredentials(client_id=client_id, client_secret=client_secret))
 
+    pl, pl_tracks = get_playlist(id)
+    
     playlistId = ytmusic.create_playlist(pl['name'], pl['description'])
 
     song_ids = []
