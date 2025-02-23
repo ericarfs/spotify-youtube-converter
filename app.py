@@ -127,26 +127,6 @@ def callback_google():
     session['profile'] = user_info
     session.permanent = True  # make the session permanant so it keeps existing after broweser gets closed
 
-    # Extract token details
-    access_token = token.get('access_token')
-    refresh_token = token.get('refresh_token')  # Only available if `access_type=offline`
-    expires_in = token.get('expires_in')  # Time (seconds) until token expires
-    expires_at = token.get('expires_at')  # Unix timestamp of expiration time
-
-    ytoauth = {
-        "scope": "https://www.googleapis.com/auth/youtube",
-        "token_type": "Bearer",
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "expires_at": expires_at,
-        "expires_in": expires_in
-    }
-
-    client_id = YOUTUBE_CLIENT_ID
-    client_secret = YOUTUBE_CLIENT_SECRET
-
-    global ytmusic
-    ytmusic = YTMusic(ytoauth, oauth_credentials=OAuthCredentials(client_id=client_id, client_secret=client_secret))
 
     return redirect(url_for('index'))
 
@@ -205,6 +185,27 @@ def create_playlist():
 
     form = request.form
     songs = [int(val) for val in form]
+
+    token = session['google_token']
+    # Extract token details
+    access_token = token.get('access_token')
+    refresh_token = token.get('refresh_token')  # Only available if `access_type=offline`
+    expires_in = token.get('expires_in')  # Time (seconds) until token expires
+    expires_at = token.get('expires_at')  # Unix timestamp of expiration time
+
+    ytoauth = {
+        "scope": "https://www.googleapis.com/auth/youtube",
+        "token_type": "Bearer",
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_at": expires_at,
+        "expires_in": expires_in
+    }
+
+    client_id = YOUTUBE_CLIENT_ID
+    client_secret = YOUTUBE_CLIENT_SECRET
+
+    ytmusic = YTMusic(ytoauth, oauth_credentials=OAuthCredentials(client_id=client_id, client_secret=client_secret))
 
     playlistId = ytmusic.create_playlist(pl['name'], pl['description'])
 
