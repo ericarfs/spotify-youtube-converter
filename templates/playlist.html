@@ -60,7 +60,9 @@
 {% block javascript %}
 <script type="text/javascript">
 $(document).ready(function(){
-   
+    var url = window.location.href
+    var lastPart = url.split("/").pop();
+    console.log(lastPart)
    $("#move_button").click(function(e){
     e.preventDefault()
     var formData = $('#tracklist').serialize();
@@ -68,7 +70,7 @@ $(document).ready(function(){
     
     if (formData.includes("on")){       
         $.ajax({
-            url: '/create_playlist',
+            url: `/create_playlist/${lastPart}`,
             type: 'post',
             data: formData,
             beforeSend: function(){

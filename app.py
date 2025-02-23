@@ -188,8 +188,8 @@ def playlist(id):
     return render_template('playlist.html', data = context)
     
 
-@app.route('/create_playlist',methods=['GET', 'POST'])
-def create_playlist():
+@app.route('/create_playlist/<id>',methods=['GET', 'POST'])
+def create_playlist(id):
     if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         return redirect(url_for('index'))
 
@@ -217,6 +217,7 @@ def create_playlist():
 
     ytmusic = YTMusic(ytoauth, oauth_credentials=OAuthCredentials(client_id=client_id, client_secret=client_secret))
 
+    print(id)
     pl, pl_tracks = get_playlist(id)
     
     playlistId = ytmusic.create_playlist(pl['name'], pl['description'])
