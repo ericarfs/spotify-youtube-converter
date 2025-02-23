@@ -72,7 +72,7 @@ google = oauth.register(
 def index():
     
     if sp_oauth.validate_token(cache_handler.get_cached_token()) and 'google_token' in session:
-        return redirect(url_for('get_playlists'))
+        return redirect(url_for('playlists'))
    
     sp = False
     yt = False
@@ -100,7 +100,7 @@ def login():
 @app.route('/google_login', methods=['GET', 'OPTIONS'])
 def google_login():
     if 'google_token' in session:
-        return redirect(url_for('get_playlists'))
+        return redirect(url_for('playlists'))
 
     google = oauth.create_client('google')  # create the google oauth client
     redirect_uri = url_for('callback_google', _external=True)
