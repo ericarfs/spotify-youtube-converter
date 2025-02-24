@@ -66,7 +66,6 @@ $(document).ready(function(){
    $("#move_button").click(function(e){
     e.preventDefault()
     var formData = $('#tracklist').serialize();
-    console.log(formData)
     
     if (formData.includes("on")){       
         $.ajax({
@@ -79,14 +78,11 @@ $(document).ready(function(){
                 $(".loader").show();
             },
             success: function(response){
-                console.log(response)
                 var resp = "<a class='btn btn-yt' target = '_blank' href= " +`"/${response}"`+">Go to the Playlist!</a>"
-                console.log(resp)
                 $('.response').append("Transfer Completed!");
                 $('.response').append(resp);
             },
             complete:function(data){
-                // Hide image container
                 $(".loader").hide();
             }
         });

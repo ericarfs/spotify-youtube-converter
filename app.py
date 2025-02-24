@@ -125,7 +125,7 @@ def callback_google():
 
     session['google_token'] = token
     session['profile'] = user_info
-    session.permanent = True  # make the session permanant so it keeps existing after broweser gets closed
+    session.permanent = False  # make the session permanant so it keeps existing after broweser gets closed
 
 
     return redirect(url_for('index'))
