@@ -138,7 +138,7 @@ def get_playlists():
 
 @app.route('/playlists')
 def playlists():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
         return redirect(url_for('index'))
 
     user_playlists = get_playlists()
@@ -175,7 +175,7 @@ def get_playlist(id):
 
 @app.route('/playlists/<id>')
 def playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
         return redirect(url_for('index'))
 
     pl, pl_tracks = get_playlist(id)
@@ -190,7 +190,7 @@ def playlist(id):
 
 @app.route('/create_playlist/<id>',methods=['GET', 'POST'])
 def create_playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
         return redirect(url_for('index'))
 
     form = request.form
