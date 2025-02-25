@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import os
 from dotenv import load_dotenv
 
@@ -125,7 +127,7 @@ def callback_google():
 
     session['google_token'] = token
     session['profile'] = user_info
-    session.permanent = False  # make the session permanant so it keeps existing after broweser gets closed
+    session.permanent = False 
 
 
     return redirect(url_for('index'))
@@ -138,7 +140,10 @@ def get_playlists():
 
 @app.route('/playlists')
 def playlists():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
+        return redirect(url_for('index'))
+
+    if datetime.now().timestamp() > session['google_token'].get('expires_at'):
         return redirect(url_for('index'))
 
     user_playlists = get_playlists()
@@ -175,7 +180,7 @@ def get_playlist(id):
 
 @app.route('/playlists/<id>')
 def playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
         return redirect(url_for('index'))
 
     pl, pl_tracks = get_playlist(id)
@@ -190,7 +195,7 @@ def playlist(id):
 
 @app.route('/create_playlist/<id>',methods=['GET', 'POST'])
 def create_playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
         return redirect(url_for('index'))
 
     form = request.form
