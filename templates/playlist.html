@@ -23,6 +23,14 @@
     {%else%}
     <div class="content content-tracks">
         <form id="tracklist">
+            <div class="input-id">
+                <label for="playlist-id" class="tooltip"> <b>Playlist ID (if you want to export the songs into an existing playlist): </b>  &#9432 
+                    <span class="tooltiptext">Go to your playlist, click on share, and copy the text between the "=" and the "&"</span>
+                </label>
+                
+                <input type="text" name="playlist-id" class="input">
+            </div>
+            
             <table id="playlist-tracks">
                 <thead>
                     <tr>
@@ -62,36 +70,56 @@
 $(document).ready(function(){
     var url = window.location.href
     var lastPart = url.split("/").pop();
-    console.log(lastPart)
+
    $("#move_button").click(function(e){
     e.preventDefault()
     var formData = $('#tracklist').serialize();
     
-    if (formData.includes("on")){       
-        $.ajax({
-            url: `/create_playlist/${lastPart}`,
-            type: 'post',
-            data: formData,
-            beforeSend: function(){
-                $("#playlist-tracks").hide();
-                $("#move_button").hide();
-                $(".loader").show();
-            },
-            success: function(response){
-                var resp = "<a class='btn btn-yt' target = '_blank' href= " +`"/${response}"`+">Go to the Playlist!</a>"
-                $('.response').append("Transfer Completed!");
-                $('.response').append(resp);
-            },
-            complete:function(data){
-                $(".loader").hide();
-            }
-        });
+    if (formData.includes("on")){  
+        const songCount = (formData.match(/on/g) || []).length;    
+        console.log(songCount) 
+        if (songCount > 50){
+            alert("Select up to 50 songs from the playlist!")
+        }
+        else{
+            $.ajax({
+                url: `/create_playlist/${lastPart}`,
+                type: 'post',
+                data: formData,
+                beforeSend: function(){
+                    $(".input-id").hide();
+                    $("#playlist-tracks").hide();
+                    $("#move_button").hide();
+                    $(".loader").show();
+                },
+                error:function(response){
+                    var resp = "<input type='button' class='btn btn-yt' id='back' value='Go back!'/>"
+                    $('.response').append("Playlist not found!");
+                    $('.response').append(resp);
+                },
+                success: function(response){
+                    var resp = "<a class='btn btn-yt' target = '_blank' href= " +`"/${response}"`+">Go to the Playlist!</a>"
+                    $('.response').append("Transfer Completed!");
+                    $('.response').append(resp);
+                },
+                complete:function(data){
+                    $(".loader").hide();
+                }
+            });
+        }
     }
     else{
         alert("Select at least one song from the playlist!")
     }
      
    });
+   
 });
+$(document).on("click", "#back", function () {
+    $(".input-id").show();
+    $("#playlist-tracks").show();
+    $("#move_button").show();
+    $(".response").empty();
+})
 </script>
 {%endblock%}

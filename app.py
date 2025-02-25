@@ -27,7 +27,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-REDIRECT_URI = 'https://ytify-swart.vercel.app/callback/spotify'
+REDIRECT_URI = 'http://localhost:5000/callback/spotify'
 scope = 'playlist-read-private'
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -36,7 +36,7 @@ API_BASE_URL = 'https://api.spotify.com/v1/'
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = 'https://ytify-swart.vercel.app/callback/google'
+GOOGLE_REDIRECT_URI = 'http://localhost:5000/callback/google'
 
 YOUTUBE_CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID')
 YOUTUBE_CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
@@ -140,10 +140,13 @@ def get_playlists():
 
 @app.route('/playlists')
 def playlists():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         return redirect(url_for('index'))
 
-    if datetime.now().timestamp() > session['google_token'].get('expires_at'):
+    expires_at = session['google_token'].get('expires_at')
+
+    if (datetime.now().timestamp() > expires_at):
+        session.clear()
         return redirect(url_for('index'))
 
     user_playlists = get_playlists()
@@ -180,7 +183,7 @@ def get_playlist(id):
 
 @app.route('/playlists/<id>')
 def playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
         return redirect(url_for('index'))
 
     pl, pl_tracks = get_playlist(id)
@@ -195,12 +198,10 @@ def playlist(id):
 
 @app.route('/create_playlist/<id>',methods=['GET', 'POST'])
 def create_playlist(id):
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()) or not 'google_token' in session:
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()) and not 'google_token' in session:
         return redirect(url_for('index'))
 
-    form = request.form
-    songs = [int(val) for val in form]
-
+    
     token = session['google_token']
     # Extract token details
     access_token = token.get('access_token')
@@ -208,6 +209,10 @@ def create_playlist(id):
     expires_in = token.get('expires_in')  # Time (seconds) until token expires
     expires_at = token.get('expires_at')  # Unix timestamp of expiration time
 
+    if (datetime.now().timestamp() > expires_at):
+        session.clear()
+        return redirect(url_for('index'))
+        
     ytoauth = {
         "scope": "https://www.googleapis.com/auth/youtube",
         "token_type": "Bearer",
@@ -222,16 +227,26 @@ def create_playlist(id):
 
     ytmusic = YTMusic(ytoauth, oauth_credentials=OAuthCredentials(client_id=client_id, client_secret=client_secret))
 
-    print(id)
     pl, pl_tracks = get_playlist(id)
     
-    playlistId = ytmusic.create_playlist(pl['name'], pl['description'])
+    form = request.form
+    songs = [val for val in form][1:]
 
+    songs = [int(song) for song in songs]
+
+    playlistId = request.form['playlist-id']
+    if playlistId:
+        try:
+            status = ytmusic.get_playlist(playlistId)
+        except:
+            raise ValueError("Playlist not found!")
+    else:    
+        playlistId = ytmusic.create_playlist(pl['name'], pl['description'])
+    
     song_ids = []
     for i, track in enumerate(pl_tracks):
         if i in songs:
             query = f"{track['name']} {track['artists']}"
-            print(query)
             search_results = ytmusic.search(query)
             for result in search_results:
                 if (result['resultType'] == 'song' or result['resultType'] == 'video') :
@@ -239,11 +254,11 @@ def create_playlist(id):
                     break
             else:
                 print("not found: ", track['name'])
-    
+
     if song_ids:
         status = ytmusic.add_playlist_items(playlistId, song_ids, duplicates=True)
         link = f"//music.youtube.com/playlist?list={playlistId}"
-
+    
     return link
 
 @app.route('/logout')
@@ -258,4 +273,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
