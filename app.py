@@ -27,7 +27,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-SPOTIPY_REDIRECT_URI =  os.getenv('SPOTIFY_REDIRECT_URI') if os.getenv('SPOTIFY_REDIRECT_URI') else 'http://localhost:5000/callback/spotify'
+SPOTIPY_REDIRECT_URI =  os.getenv('SPOTIFY_REDIRECT_URI')
 scope = 'playlist-read-private'
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -36,7 +36,7 @@ API_BASE_URL = 'https://api.spotify.com/v1/'
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI') if os.getenv('GOOGLE_REDIRECT_URI') else 'http://localhost:5000/callback/google'
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI') 
 
 YOUTUBE_CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID')
 YOUTUBE_CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET')
